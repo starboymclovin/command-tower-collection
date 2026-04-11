@@ -1,4 +1,9 @@
 {
-  "owned": [],
-  "foil": []
+  "owned": [
+    "a3b45c12-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "b7d91e34-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  ],
+  "foil": [
+    "c9f23a56-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  ]
 }
