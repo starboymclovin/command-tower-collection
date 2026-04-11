@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Tower Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0b0c14;
+      color: #e8e0d0;
+      font-family: 'Crimson Text', Georgia, serif;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, #1a1230 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 90%, #0d1a20 0%, transparent 55%);
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0c14; }
+    ::-webkit-scrollbar-thumb { background: #252636; border-radius: 3px; }
+
+    /* Header */
+    #header {
+      text-align: center;
+      padding: 44px 24px 24px;
+      border-bottom: 1px solid #1c1d2c;
+      position: relative;
+      overflow: hidden;
+    }
+    #header::before {
+      content: "⬡";
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 300px; opacity: 0.025; pointer-events: none;
+      font-family: 'Cinzel', serif; color: #e8d5a0;
+    }
+    .label {
+      font-size: 10px; letter-spacing: .3em; color: #7c6a3e;
+      text-transform: uppercase; margin-bottom: 8px;
+      font-family: 'Cinzel', serif;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(26px, 6vw, 50px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #e8d5a0 20%, #c8a050 60%, #e8d5a0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+    .subtitle { font-size: 13px; color: #4e4658; font-style: italic; margin-bottom: 28px; }
+
+    /* Stats */
+    #stats { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-bottom: 18px; }
+    .stat-val { font-size: clamp(20px, 4vw, 32px); font-family: 'Cinzel', serif; font-weight: 700; }
+    .stat-lbl { font-size: 9px; color: #3a3b4c; letter-spacing: .14em; text-transform: uppercase; }
+
+    /* Progress bar */
+    #progress-wrap { max-width: 460px; margin: 0 auto; padding: 0 16px; }
+    #progress-bar { height: 5px; border-radius: 3px; background: #181929; overflow: hidden; }
+    #progress-fill { height: 100%; background: linear-gradient(90deg, #3d8a3d, #7ecb7e); border-radius: 3px; transition: width .6s ease; width: 0%; }
+
+    /* Controls */
+    #controls {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; padding: 18px 24px 0;
+      max-width: 1400px; margin: 0 auto;
+    }
+    #search-input {
+      background: #12131f; border: 1px solid #22233a; color: #e8e0d0;
+      border-radius: 6px; padding: 7px 13px; font-size: 13px;
+      font-family: 'Crimson Text', serif; outline: none; width: 210px;
+    }
+    .filter-btn {
+      padding: 7px 16px; border-radius: 6px; border: 1px solid #22233a;
+      background: #12131f; color: #555;
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn.active { border-color: #e8c56a; background: #1c1a0e; color: #e8c56a; }
+
+    /* Grid */
+    #grid {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; gap: 14px;
+      justify-content: center; padding: 22px 24px 60px;
+    }
+
+    /* Card tile */
+    .card-tile { width: 156px; flex-shrink: 0; }
+    .card-img-wrap {
+      border-radius: 10px; overflow: hidden;
+      border: 2px solid #1e2030;
+      box-shadow: 0 4px 16px #0009;
+      transition: transform .18s, border-color .2s, box-shadow .2s;
+      position: relative; cursor: default;
+    }
+    .card-img-wrap:hover { transform: scale(1.045); }
+    .card-img-wrap.owned { border-color: #7ecb7e; box-shadow: 0 0 14px #7ecb7e55; }
+    .card-img-wrap.foil  { border-color: #a78bfa; box-shadow: 0 0 14px #a78bfa55; }
+    .card-img-wrap img { width: 100%; display: block; }
+    .card-placeholder {
+      padding-top: 139%; position: relative; background: #161728;
+    }
+    .card-placeholder span {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; color: #333; font-size: 10px;
+      text-align: center; padding: 6px;
+    }
+    .owned-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; font-size: 2.2rem;
+      filter: drop-shadow(0 2px 5px #000b);
+    }
+    .owned-overlay.owned { background: #7ecb7e20; }
+    .owned-overlay.foil  { background: #a78bfa20; }
+
+    .card-info {
+      margin-top: 6px; background: #12131f;
+      border: 1px solid #22233a; border-radius: 8px;
+      padding: 7px 7px 6px;
+    }
+    .card-set-name { font-size: 10px; font-weight: 700; color: #e8d5a0; line-height: 1.25; margin-bottom: 3px; letter-spacing: .03em; }
+    .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #555; margin-bottom: 5px; }
+    .card-btns { display: flex; gap: 4px; }
+    .card-btn {
+      flex: 1; padding: 4px 0; border-radius: 5px; border: none;
+      background: #1a1b2c; color: #666;
+      font-size: 9px; font-weight: 700; cursor: pointer;
+      letter-spacing: .05em; transition: background .15s, color .15s;
+    }
+    .card-btn.owned-active { background: #3d8a3d; color: #fff; }
+    .card-btn.foil-active  { background: #4e2f8a; color: #ddd0ff; }
+
+    /* Loader */
+    #loader { text-align: center; padding: 80px 0; color: #333; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100% { opacity: .4; } 50% { opacity: 1; } }
+    #loader .spinner { font-size: 34px; display: inline-block; animation: spin 2s linear infinite; }
+    #loader .msg { font-family: 'Cinzel', serif; letter-spacing: .2em; font-size: 11px; margin-top: 14px; animation: pulse 2s infinite; }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 18px;
+      border-top: 1px solid #181929;
+      font-size: 10px; color: #202130; letter-spacing: .1em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div class="label">Collection Tracker</div>
+  <h1>Command Tower</h1>
+  <p class="subtitle">Every printing. Every edition. One collection.</p>
+  <div id="stats" style="display:none">
+    <div><div class="stat-val" id="stat-total" style="color:#8090b0">—</div><div class="stat-lbl">Total Printings</div></div>
+    <div><div class="stat-val" id="stat-owned" style="color:#7ecb7e">0</div><div class="stat-lbl">Owned</div></div>
+    <div><div class="stat-val" id="stat-foil"  style="color:#a78bfa">0</div><div class="stat-lbl">Foil Copies</div></div>
+    <div><div class="stat-val" id="stat-pct"   style="color:#e8c56a">0%</div><div class="stat-lbl">Progress</div></div>
+  </div>
+  <div id="progress-wrap" style="display:none">
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+  </div>
+</div>
+
+<div id="controls" style="display:none">
+  <input id="search-input" type="text" placeholder="Search set name…" oninput="applyFilters()" />
+  <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" onclick="setFilter('owned',this)">Owned</button>
+  <button class="filter-btn" onclick="setFilter('missing',this)">Missing</button>
+</div>
+
+<div id="grid">
+  <div id="loader">
+    <div class="spinner">⬡</div>
+    <div class="msg">Fetching all printings from Scryfall…</div>
+  </div>
+</div>
+
+<footer>Card data · Scryfall API · collection.json · GitHub Pages</footer>
+
+<script>
+  const SCRYFALL  = 'https://api.scryfall.com/cards/search?q=%21%22Command+Tower%22&unique=prints&order=released&dir=asc';
+  const COLLECTION = 'collection.json';
+
+  let allCards = [];
+  let owned    = new Set();
+  let foilOwned = new Set();
+  let activeFilter = 'all';
+
+  function rarityColor(r) {
+    return r==='mythic'?'#e8a73a':r==='rare'?'#c8a860':r==='uncommon'?'#b0c4d8':'#9e9e9e';
+  }
+
+  async function fetchAllCards() {
+    let cards = [], url = SCRYFALL;
+    while (url) {
+      const r = await fetch(url);
+      const d = await r.json();
+      if (d.object === 'error') throw new Error(d.details);
+      cards = cards.concat(d.data);
+      url = d.has_more ? d.next_page : null;
+      if (url) await new Promise(r => setTimeout(r, 100));
+    }
+    return cards;
+  }
+
+  async function loadCollection() {
+    try {
+      const r = await fetch(COLLECTION + '?v=' + Date.now());
+      const d = await r.json();
+      owned     = new Set(d.owned  || []);
+      foilOwned = new Set(d.foil   || []);
+    } catch (e) {
+      console.warn('Could not load collection.json:', e.message);
+    }
+  }
+
+  function buildTile(card) {
+    const isOwned = owned.has(card.id);
+    const isFoil  = foilOwned.has(card.id);
+    const img     = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
+    const year    = card.released_at?.slice(0,4) || '?';
+    const hl      = isOwned ? 'owned' : isFoil ? 'foil' : '';
+
+    return `
+      <div class="card-tile" data-id="${card.id}" data-set="${card.set}" data-setname="${card.set_name?.toLowerCase()}">
+        <div class="card-img-wrap ${hl}">
+          ${img
+            ? `<img src="${img}" alt="${card.set_name}" loading="lazy" />`
+            : `<div class="card-placeholder"><span>${card.set_name}</span></div>`}
+          ${hl ? `<div class="owned-overlay ${hl}">${isOwned ? '✓' : '✦'}</div>` : ''}
+        </div>
+        <div class="card-info">
+          <div class="card-set-name">${card.set_name}</div>
+          <div class="card-meta">
+            <span style="color:${rarityColor(card.rarity)};text-transform:uppercase;letter-spacing:.05em">${card.rarity}</span>
+            <span>#${card.collector_number}</span>
+            <span>${year}</span>
+          </div>
+          <div class="card-btns">
+            <button class="card-btn ${isOwned?'owned-active':''}" onclick="copyId('${card.id}')">
+              ${isOwned ? '✓ OWNED' : 'COPY ID'}
+            </button>
+            ${card.foil ? `<button class="card-btn ${isFoil?'foil-active':''}" onclick="copyId('${card.id}','foil')">
+              ${isFoil ? '✦ FOIL' : 'COPY ID'}
+            </button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function copyId(id, type='normal') {
+    navigator.clipboard.writeText(id).then(() => {
+      alert(`Copied Scryfall ID:\n${id}\n\nAdd it to "${type === 'foil' ? 'foil' : 'owned'}" array in collection.json`);
+    });
+  }
+
+  function updateStats() {
+    const total = allCards.length;
+    const oc    = allCards.filter(c => owned.has(c.id)).length;
+    const fc    = allCards.filter(c => foilOwned.has(c.id)).length;
+    const pct   = total ? Math.round(oc/total*100) : 0;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-owned').textContent = oc;
+    document.getElementById('stat-foil').textContent  = fc;
+    document.getElementById('stat-pct').textContent   = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('stats').style.display = 'flex';
+    document.getElementById('progress-wrap').style.display = 'block';
+  }
+
+  function setFilter(f, btn) {
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    document.querySelectorAll('.card-tile').forEach(tile => {
+      const id  = tile.dataset.id;
+      const sn  = tile.dataset.setname || '';
+      const sc  = tile.dataset.set || '';
+      const matchSearch = !q || sn.includes(q) || sc.includes(q);
+      const isOwned = owned.has(id) || foilOwned.has(id);
+      const show =
+        matchSearch &&
+        (activeFilter === 'all' ||
+         (activeFilter === 'owned'   && isOwned) ||
+         (activeFilter === 'missing' && !isOwned));
+      tile.style.display = show ? '' : 'none';
+    });
+  }
+
+  async function init() {
+    try {
+      const [cards] = await Promise.all([fetchAllCards(), loadCollection()]);
+      allCards = cards;
+      const grid = document.getElementById('grid');
+      grid.innerHTML = cards.map(buildTile).join('');
+      document.getElementById('controls').style.display = 'flex';
+      updateStats();
+      applyFilters();
+    } catch(e) {
+      document.getElementById('loader').innerHTML =
+        `<div style="color:#b04040;font-size:13px;padding:60px 24px">${e.message}</div>`;
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
