@@ -17,7 +17,7 @@
     ::-webkit-scrollbar-track { background: #0b0c14; }
     ::-webkit-scrollbar-thumb { background: #252636; border-radius: 3px; }
 
-    /* Header */
+    /* ── Header ─────────────────────────────────────────────────── */
     #header {
       text-align: center; padding: 44px 24px 24px;
       border-bottom: 1px solid #1c1d2c; position: relative; overflow: hidden;
@@ -43,42 +43,61 @@
     #progress-bar { height: 5px; border-radius: 3px; background: #181929; overflow: hidden; }
     #progress-fill { height: 100%; background: linear-gradient(90deg,#3d8a3d,#7ecb7e); border-radius: 3px; transition: width .6s ease; width: 0%; }
 
-    /* Controls */
+    /* ── Controls ───────────────────────────────────────────────── */
     #controls { display:none; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 18px 24px 0; max-width: 1400px; margin: 0 auto; }
     #search-input { background: #12131f; border: 1px solid #22233a; color: #e8e0d0; border-radius: 6px; padding: 7px 13px; font-size: 13px; font-family: 'Crimson Text',serif; outline: none; width: 210px; }
     .filter-btn { padding: 7px 16px; border-radius: 6px; border: 1px solid #22233a; background: #12131f; color: #555; font-family: 'Cinzel',serif; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .15s; }
     .filter-btn.active { border-color: #e8c56a; background: #1c1a0e; color: #e8c56a; }
 
-    /* Grid */
-    #grid { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 22px 24px 60px; }
+    /* ── Grid ───────────────────────────────────────────────────── */
+    #grid { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 22px 24px 80px; }
 
-    /* Card tile */
-    .card-tile { width: 156px; flex-shrink: 0; }
+    /* ── Card tile ──────────────────────────────────────────────── */
+    .card-tile { width: 148px; flex-shrink: 0; }
+
+    .card-tile.is-foil-tile .card-img-wrap { border-color: #3a2d5a; }
+    .card-tile.is-foil-tile .card-img-wrap.owned { border-color: #a78bfa; box-shadow: 0 0 14px #a78bfa55; }
+
     .card-img-wrap {
       border-radius: 10px; overflow: hidden; border: 2px solid #1e2030;
       box-shadow: 0 4px 16px #0009; transition: transform .18s, border-color .2s, box-shadow .2s;
       position: relative;
     }
+    .card-img-wrap:hover { transform: scale(1.045); }
     .card-img-wrap.owned { border-color: #7ecb7e; box-shadow: 0 0 14px #7ecb7e55; }
-    .card-img-wrap.foil  { border-color: #a78bfa; box-shadow: 0 0 14px #a78bfa55; }
     .card-img-wrap img { width: 100%; display: block; }
-    .admin-mode .card-img-wrap { cursor: pointer; }
-    .admin-mode .card-img-wrap:hover { transform: scale(1.045); }
     .card-placeholder { padding-top: 139%; position: relative; background: #161728; }
     .card-placeholder span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #333; font-size: 10px; text-align: center; padding: 6px; }
-    .owned-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; font-size: 2.2rem; filter: drop-shadow(0 2px 5px #000b); }
-    .owned-overlay.owned { background: #7ecb7e20; }
-    .owned-overlay.foil  { background: #a78bfa20; }
-    .card-info { margin-top: 6px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 7px 7px 6px; }
-    .card-set-name { font-size: 10px; font-weight: 700; color: #e8d5a0; line-height: 1.25; margin-bottom: 3px; letter-spacing: .03em; }
-    .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #555; margin-bottom: 5px; }
-    .card-btns { display: flex; gap: 4px; }
-    .card-btn { flex: 1; padding: 4px 0; border-radius: 5px; border: none; background: #1a1b2c; color: #666; font-size: 9px; font-weight: 700; cursor: pointer; letter-spacing: .05em; transition: background .15s, color .15s; }
-    .card-btn.owned-active { background: #3d8a3d; color: #fff; }
-    .card-btn.foil-active  { background: #4e2f8a; color: #ddd0ff; }
-    .admin-mode .card-btn { display: none; } /* hide buttons in admin, use image click instead */
 
-    /* Admin bar */
+    .owned-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; pointer-events: none; font-size: 2.2rem;
+      filter: drop-shadow(0 2px 5px #000b);
+    }
+    .owned-overlay.owned-reg  { background: #7ecb7e20; }
+    .owned-overlay.owned-foil { background: #a78bfa20; }
+
+    .foil-shimmer {
+      position: absolute; inset: 0; pointer-events: none; border-radius: 8px;
+      background: linear-gradient(115deg, transparent 30%, rgba(180,140,255,.13) 50%, transparent 70%);
+    }
+
+    .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 5px; }
+    .card-set-name { font-size: 10px; font-weight: 700; color: #e8d5a0; line-height: 1.25; margin-bottom: 3px; letter-spacing: .03em; }
+    .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #555; margin-bottom: 4px; }
+    .foil-badge { font-size: 8px; letter-spacing: .06em; color: #7a60c0; text-transform: uppercase; font-weight: 700; }
+
+    .card-btn {
+      width: 100%; padding: 4px 0; border-radius: 5px; border: none;
+      background: #1a1b2c; color: #666;
+      font-size: 9px; font-weight: 700; cursor: pointer;
+      letter-spacing: .05em; transition: background .15s, color .15s;
+    }
+    .card-btn.owned-active-reg  { background: #3d8a3d; color: #fff; }
+    .card-btn.owned-active-foil { background: #4e2f8a; color: #ddd0ff; }
+    .admin-mode .card-btn:hover { opacity: .85; }
+
+    /* ── Admin bar ──────────────────────────────────────────────── */
     #admin-bar {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
       background: #0e0f1a; border-top: 1px solid #2a2b3d;
@@ -86,72 +105,54 @@
       padding: 10px 20px; flex-wrap: wrap;
     }
     #admin-bar .hint { font-size: 11px; color: #555; font-style: italic; flex: 1; }
-    #admin-bar .hint span { color: #7ecb7e; }
+    #admin-bar .hint span.reg  { color: #7ecb7e; }
     #admin-bar .hint span.foil { color: #a78bfa; }
     #save-btn {
       padding: 8px 22px; border-radius: 6px; border: none;
       background: linear-gradient(135deg,#3d8a3d,#5cb85c); color: #fff;
       font-family: 'Cinzel',serif; font-size: 11px; font-weight: 700;
-      letter-spacing: .1em; cursor: pointer; transition: opacity .2s;
+      letter-spacing: .1em; cursor: pointer;
     }
     #save-btn:disabled { opacity: .4; cursor: default; }
-    #save-status { font-size: 11px; color: #777; min-width: 120px; }
+    #save-status { font-size: 11px; color: #777; min-width: 100px; }
     #logout-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #2a2b3d; background: transparent; color: #444; font-family: 'Cinzel',serif; font-size: 10px; cursor: pointer; letter-spacing: .08em; }
 
-    /* Lock button */
+    /* ── Lock button ────────────────────────────────────────────── */
     #lock-btn {
       position: fixed; top: 16px; right: 16px; z-index: 200;
       width: 36px; height: 36px; border-radius: 50%;
       border: 1px solid #22233a; background: #12131f;
       color: #444; font-size: 16px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: border-color .2s, color .2s;
     }
     #lock-btn.unlocked { border-color: #e8c56a; color: #e8c56a; }
 
-    /* Modal */
-    #modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 300;
-      background: #0009; align-items: center; justify-content: center;
-    }
+    /* ── Modal ──────────────────────────────────────────────────── */
+    #modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: #0009; align-items: center; justify-content: center; }
     #modal-overlay.open { display: flex; }
-    #modal {
-      background: #12131f; border: 1px solid #2a2b3d; border-radius: 12px;
-      padding: 28px; width: 360px; max-width: 90vw;
-    }
+    #modal { background: #12131f; border: 1px solid #2a2b3d; border-radius: 12px; padding: 28px; width: 360px; max-width: 90vw; }
     #modal h2 { font-family: 'Cinzel',serif; font-size: 16px; color: #e8d5a0; margin-bottom: 6px; }
     #modal p { font-size: 12px; color: #555; margin-bottom: 18px; line-height: 1.6; }
     #modal label { font-size: 11px; color: #888; display: block; margin-bottom: 6px; letter-spacing: .08em; text-transform: uppercase; }
-    #token-input, #repo-input, #owner-input {
-      width: 100%; background: #0b0c14; border: 1px solid #22233a; color: #e8e0d0;
-      border-radius: 6px; padding: 8px 12px; font-size: 12px;
-      font-family: 'Crimson Text',serif; outline: none; margin-bottom: 12px;
-    }
-    #modal-login-btn {
-      width: 100%; padding: 10px; border-radius: 6px; border: none;
-      background: linear-gradient(135deg,#7c6a3e,#c8a050); color: #fff;
-      font-family: 'Cinzel',serif; font-size: 12px; font-weight: 700;
-      letter-spacing: .1em; cursor: pointer; margin-top: 4px;
-    }
+    #token-input, #repo-input, #owner-input { width: 100%; background: #0b0c14; border: 1px solid #22233a; color: #e8e0d0; border-radius: 6px; padding: 8px 12px; font-size: 12px; font-family: 'Crimson Text',serif; outline: none; margin-bottom: 12px; }
+    #modal-login-btn { width: 100%; padding: 10px; border-radius: 6px; border: none; background: linear-gradient(135deg,#7c6a3e,#c8a050); color: #fff; font-family: 'Cinzel',serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; cursor: pointer; margin-top: 4px; }
     #modal-error { font-size: 11px; color: #b04040; margin-top: 8px; min-height: 16px; }
     #modal-close { float: right; background: none; border: none; color: #444; font-size: 18px; cursor: pointer; margin-top: -4px; }
 
-    /* Loader */
+    /* ── Loader ─────────────────────────────────────────────────── */
     #loader { text-align: center; padding: 80px 0; color: #333; width: 100%; }
-    @keyframes spin   { to { transform: rotate(360deg); } }
-    @keyframes pulse  { 0%,100%{opacity:.4}50%{opacity:1} }
+    @keyframes spin  { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100%{opacity:.4}50%{opacity:1} }
     .spinner { font-size: 34px; display: inline-block; animation: spin 2s linear infinite; }
     .msg { font-family: 'Cinzel',serif; letter-spacing: .2em; font-size: 11px; margin-top: 14px; animation: pulse 2s infinite; }
 
-    footer { text-align: center; padding: 18px 18px 70px; border-top: 1px solid #181929; font-size: 10px; color: #202130; letter-spacing: .1em; }
+    footer { text-align: center; padding: 18px 18px 80px; border-top: 1px solid #181929; font-size: 10px; color: #202130; letter-spacing: .1em; }
   </style>
 </head>
 <body>
 
-<!-- Lock button -->
 <button id="lock-btn" onclick="openModal()" title="Admin login">🔒</button>
 
-<!-- Header -->
 <div id="header">
   <div class="label">Collection Tracker</div>
   <h1>Command Tower</h1>
@@ -159,7 +160,7 @@
   <div id="stats">
     <div><div class="stat-val" id="stat-total" style="color:#8090b0">—</div><div class="stat-lbl">Total Printings</div></div>
     <div><div class="stat-val" id="stat-owned" style="color:#7ecb7e">0</div><div class="stat-lbl">Owned</div></div>
-    <div><div class="stat-val" id="stat-foil"  style="color:#a78bfa">0</div><div class="stat-lbl">Foil Copies</div></div>
+    <div><div class="stat-val" id="stat-foil"  style="color:#a78bfa">0</div><div class="stat-lbl">Foil Owned</div></div>
     <div><div class="stat-val" id="stat-pct"   style="color:#e8c56a">0%</div><div class="stat-lbl">Progress</div></div>
   </div>
   <div id="progress-wrap">
@@ -167,7 +168,6 @@
   </div>
 </div>
 
-<!-- Controls -->
 <div id="controls">
   <input id="search-input" type="text" placeholder="Search set name…" oninput="applyFilters()" />
   <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
@@ -175,7 +175,6 @@
   <button class="filter-btn" onclick="setFilter('missing',this)">Missing</button>
 </div>
 
-<!-- Card grid -->
 <div id="grid">
   <div id="loader">
     <div class="spinner">⬡</div>
@@ -183,22 +182,18 @@
   </div>
 </div>
 
-<!-- Admin bar (hidden until logged in) -->
 <div id="admin-bar" style="display:none">
-  <div class="hint">
-    Admin mode · Click card image = toggle <span>owned</span> · Double-click = toggle <span class="foil">foil</span>
-  </div>
+  <div class="hint">Admin mode · Click <span class="reg">■ OWNED</span> or <span class="foil">✦ FOIL</span> buttons to toggle · then Save</div>
   <span id="save-status"></span>
   <button id="save-btn" onclick="saveCollection()" disabled>Save Changes</button>
   <button id="logout-btn" onclick="logout()">Logout</button>
 </div>
 
-<!-- Login modal -->
 <div id="modal-overlay">
   <div id="modal">
     <button id="modal-close" onclick="closeModal()">✕</button>
     <h2>Admin Login</h2>
-    <p>Enter your GitHub details to enable collection editing. Your token is stored only in your browser.</p>
+    <p>Enter your GitHub details to enable collection editing. Credentials are stored only in your browser.</p>
     <label>GitHub Username</label>
     <input id="owner-input" type="text" placeholder="your-username" />
     <label>Repository Name</label>
@@ -210,23 +205,21 @@
   </div>
 </div>
 
-<footer>Card data · Scryfall API · Saved to GitHub · <span id="footer-repo"></span></footer>
+<footer>Card data · Scryfall API · Commander-legal only · Saved to GitHub · <span id="footer-repo"></span></footer>
 
 <script>
-  // ── Config ────────────────────────────────────────────────────────────────
   const SCRYFALL   = 'https://api.scryfall.com/cards/search?q=%21%22Command+Tower%22&unique=prints&order=released&dir=asc';
   const COLLECTION = 'collection.json';
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let allCards     = [];
-  let owned        = new Set();
-  let foilOwned    = new Set();
-  let dirty        = false;
+  let allTiles  = [];
+  let owned     = new Set();
+  let foilOwned = new Set();
+  let dirty     = false;
   let activeFilter = 'all';
-  let ghToken      = localStorage.getItem('ct_token')  || '';
-  let ghOwner      = localStorage.getItem('ct_owner')  || '';
-  let ghRepo       = localStorage.getItem('ct_repo')   || '';
-  let collectionSha = '';
+  let ghToken   = localStorage.getItem('ct_token') || '';
+  let ghOwner   = localStorage.getItem('ct_owner') || '';
+  let ghRepo    = localStorage.getItem('ct_repo')  || '';
 
   // ── Scryfall fetch ────────────────────────────────────────────────────────
   async function fetchAllCards() {
@@ -239,7 +232,18 @@
       url = d.has_more ? d.next_page : null;
       if (url) await new Promise(r => setTimeout(r, 110));
     }
-    return cards;
+    // Keep only commander-legal cards
+    return cards.filter(c => c.legalities?.commander === 'legal');
+  }
+
+  // One nonfoil tile + one foil tile per printing where applicable
+  function buildTileList(cards) {
+    const tiles = [];
+    for (const card of cards) {
+      if (card.nonfoil) tiles.push({ card, isFoil: false });
+      if (card.foil)    tiles.push({ card, isFoil: true  });
+    }
+    return tiles;
   }
 
   // ── Collection load ───────────────────────────────────────────────────────
@@ -249,34 +253,27 @@
       const d = await r.json();
       owned     = new Set(d.owned || []);
       foilOwned = new Set(d.foil  || []);
-    } catch(e) { console.warn('collection.json not loaded:', e.message); }
+    } catch(e) { console.warn('collection.json:', e.message); }
   }
 
   // ── GitHub save ───────────────────────────────────────────────────────────
-  async function getFileSha() {
-    const r = await fetch(
-      `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${COLLECTION}`,
-      { headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' } }
-    );
-    if (!r.ok) return null;
-    const d = await r.json();
-    return d.sha;
-  }
-
   async function saveCollection() {
     if (!ghToken) { openModal(); return; }
-    const btn = document.getElementById('save-btn');
+    const btn    = document.getElementById('save-btn');
     const status = document.getElementById('save-status');
     btn.disabled = true;
-    status.textContent = 'Saving…';
-    status.style.color = '#777';
+    status.textContent = 'Saving…'; status.style.color = '#777';
 
     try {
-      const sha = await getFileSha();
+      const meta = await fetch(
+        `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${COLLECTION}`,
+        { headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' } }
+      );
+      const sha = meta.ok ? (await meta.json()).sha : null;
+
       const content = JSON.stringify({ owned: [...owned], foil: [...foilOwned] }, null, 2);
       const encoded = btoa(unescape(encodeURIComponent(content)));
-
-      const body = { message: 'Update collection', content: encoded };
+      const body    = { message: 'Update collection', content: encoded };
       if (sha) body.sha = sha;
 
       const r = await fetch(
@@ -287,87 +284,92 @@
           body: JSON.stringify(body),
         }
       );
-      if (!r.ok) {
-        const err = await r.json();
-        throw new Error(err.message || 'GitHub API error');
-      }
+      if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'GitHub API error'); }
+
       dirty = false;
-      btn.disabled = true;
-      status.textContent = '✓ Saved!';
-      status.style.color = '#7ecb7e';
+      status.textContent = '✓ Saved!'; status.style.color = '#7ecb7e';
       setTimeout(() => { status.textContent = ''; }, 3000);
     } catch(e) {
-      status.textContent = '✗ ' + e.message;
-      status.style.color = '#b04040';
+      status.textContent = '✗ ' + e.message; status.style.color = '#b04040';
       btn.disabled = false;
     }
   }
 
-  // ── Card toggle ───────────────────────────────────────────────────────────
-  function toggleCard(id, type) {
+  // ── Toggle owned/foil ─────────────────────────────────────────────────────
+  function toggleTile(cardId, isFoil) {
     if (!ghToken) return;
-    if (type === 'foil') {
-      foilOwned.has(id) ? foilOwned.delete(id) : foilOwned.add(id);
-    } else {
-      owned.has(id) ? owned.delete(id) : owned.add(id);
-    }
+    const key = isFoil ? cardId + '_foil' : cardId;
+    const set = isFoil ? foilOwned : owned;
+    set.has(key) ? set.delete(key) : set.add(key);
     dirty = true;
     document.getElementById('save-btn').disabled = false;
-    rerenderTile(id);
+    rerenderTile(cardId, isFoil);
     updateStats();
     applyFilters();
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // ── Render helpers ────────────────────────────────────────────────────────
   function rarityColor(r) {
     return r==='mythic'?'#e8a73a':r==='rare'?'#c8a860':r==='uncommon'?'#b0c4d8':'#9e9e9e';
   }
 
-  function buildTile(card) {
-    const isOwned = owned.has(card.id);
-    const isFoil  = foilOwned.has(card.id);
-    const img     = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
-    const year    = card.released_at?.slice(0,4) || '?';
-    const hl      = isOwned ? 'owned' : isFoil ? 'foil' : '';
+  function tileKey(cardId, isFoil) { return isFoil ? cardId + '_foil' : cardId; }
+
+  function buildTileHTML(card, isFoil) {
+    const key      = tileKey(card.id, isFoil);
+    const isOwned  = isFoil ? foilOwned.has(key) : owned.has(key);
+    const img      = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
+    const year     = card.released_at?.slice(0,4) || '?';
+    const hl       = isOwned ? 'owned' : '';
+    const overlayClass = isFoil ? 'owned-foil' : 'owned-reg';
+    const btnClass     = isFoil ? 'owned-active-foil' : 'owned-active-reg';
+    const btnLabel     = isOwned
+      ? (isFoil ? '✦ FOIL OWNED' : '✓ OWNED')
+      : (isFoil ? '✦ MARK FOIL'  : '■ MARK OWNED');
 
     return `
-      <div class="card-tile" data-id="${card.id}" data-set="${card.set}" data-setname="${card.set_name?.toLowerCase() || ''}">
-        <div class="card-img-wrap ${hl}" onclick="toggleCard('${card.id}','normal')" ondblclick="toggleCard('${card.id}','foil');event.preventDefault()">
-          ${img ? `<img src="${img}" alt="${card.set_name}" loading="lazy" />` : `<div class="card-placeholder"><span>${card.set_name}</span></div>`}
-          ${hl ? `<div class="owned-overlay ${hl}">${isOwned ? '✓' : '✦'}</div>` : ''}
+      <div class="card-tile ${isFoil ? 'is-foil-tile' : ''}"
+           data-id="${card.id}" data-foil="${isFoil}"
+           data-set="${card.set}" data-setname="${(card.set_name||'').toLowerCase()}">
+        <div class="card-img-wrap ${hl}">
+          ${img
+            ? `<img src="${img}" alt="${card.set_name}" loading="lazy" />`
+            : `<div class="card-placeholder"><span>${card.set_name}</span></div>`}
+          ${isFoil ? '<div class="foil-shimmer"></div>' : ''}
+          ${isOwned ? `<div class="owned-overlay ${overlayClass}">${isFoil ? '✦' : '✓'}</div>` : ''}
         </div>
         <div class="card-info">
           <div class="card-set-name">${card.set_name}</div>
           <div class="card-meta">
             <span style="color:${rarityColor(card.rarity)};text-transform:uppercase;letter-spacing:.05em">${card.rarity}</span>
             <span>#${card.collector_number}</span>
-            <span>${year}</span>
+            ${isFoil ? '<span class="foil-badge">✦ foil</span>' : `<span>${year}</span>`}
           </div>
-          <div class="card-btns">
-            <button class="card-btn ${isOwned?'owned-active':''}">${isOwned ? '✓ OWNED' : 'NOT OWNED'}</button>
-            ${card.foil ? `<button class="card-btn ${isFoil?'foil-active':''}">${isFoil ? '✦ FOIL' : 'NO FOIL'}</button>` : ''}
-          </div>
+          <button class="card-btn ${isOwned ? btnClass : ''}"
+                  onclick="toggleTile('${card.id}', ${isFoil})">
+            ${btnLabel}
+          </button>
         </div>
       </div>`;
   }
 
-  function rerenderTile(id) {
-    const tile = document.querySelector(`.card-tile[data-id="${id}"]`);
+  function rerenderTile(cardId, isFoil) {
+    const tile = document.querySelector(`.card-tile[data-id="${cardId}"][data-foil="${isFoil}"]`);
     if (!tile) return;
-    const card = allCards.find(c => c.id === id);
-    if (!card) return;
-    const next = document.createElement('div');
-    next.innerHTML = buildTile(card);
-    tile.replaceWith(next.firstElementChild);
-    applyFilters();
+    const entry = allTiles.find(t => t.card.id === cardId && t.isFoil === isFoil);
+    if (!entry) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = buildTileHTML(entry.card, isFoil);
+    tile.replaceWith(tmp.firstElementChild);
   }
 
   function updateStats() {
-    const total = allCards.length;
-    const oc = allCards.filter(c => owned.has(c.id)).length;
-    const fc = allCards.filter(c => foilOwned.has(c.id)).length;
-    const pct = total ? Math.round(oc/total*100) : 0;
-    document.getElementById('stat-total').textContent = total;
+    const totalCards = new Set(allTiles.map(t => t.card.id)).size;
+    const totalTiles = allTiles.length;
+    const oc  = allTiles.filter(t => !t.isFoil && owned.has(t.card.id)).length;
+    const fc  = allTiles.filter(t =>  t.isFoil && foilOwned.has(t.card.id + '_foil')).length;
+    const pct = totalTiles ? Math.round((oc + fc) / totalTiles * 100) : 0;
+    document.getElementById('stat-total').textContent = totalCards;
     document.getElementById('stat-owned').textContent = oc;
     document.getElementById('stat-foil').textContent  = fc;
     document.getElementById('stat-pct').textContent   = pct + '%';
@@ -386,11 +388,13 @@
   function applyFilters() {
     const q = document.getElementById('search-input').value.toLowerCase();
     document.querySelectorAll('.card-tile').forEach(tile => {
-      const id = tile.dataset.id;
-      const sn = tile.dataset.setname || '';
-      const sc = tile.dataset.set || '';
+      const id     = tile.dataset.id;
+      const isFoil = tile.dataset.foil === 'true';
+      const sn     = tile.dataset.setname || '';
+      const sc     = tile.dataset.set || '';
       const matchSearch = !q || sn.includes(q) || sc.includes(q);
-      const isOwned = owned.has(id) || foilOwned.has(id);
+      const key      = tileKey(id, isFoil);
+      const isOwned  = isFoil ? foilOwned.has(key) : owned.has(key);
       const show = matchSearch && (
         activeFilter === 'all' ||
         (activeFilter === 'owned'   &&  isOwned) ||
@@ -416,17 +420,13 @@
     const repo  = document.getElementById('repo-input').value.trim();
     const errEl = document.getElementById('modal-error');
     errEl.textContent = 'Verifying…';
-
-    // Test the token
     const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`,
       { headers: { Authorization: `token ${token}` } });
-    if (!r.ok) { errEl.textContent = '✗ Could not access repo — check your token and details.'; return; }
-
+    if (!r.ok) { errEl.textContent = '✗ Could not access repo — check token and details.'; return; }
     ghToken = token; ghOwner = owner; ghRepo = repo;
     localStorage.setItem('ct_token', token);
     localStorage.setItem('ct_owner', owner);
     localStorage.setItem('ct_repo',  repo);
-
     document.getElementById('footer-repo').textContent = `${owner}/${repo}`;
     closeModal();
     enableAdminMode();
@@ -434,9 +434,7 @@
 
   function logout() {
     ghToken = ''; ghOwner = ''; ghRepo = '';
-    localStorage.removeItem('ct_token');
-    localStorage.removeItem('ct_owner');
-    localStorage.removeItem('ct_repo');
+    ['ct_token','ct_owner','ct_repo'].forEach(k => localStorage.removeItem(k));
     disableAdminMode();
   }
 
@@ -460,9 +458,9 @@
   async function init() {
     try {
       const [cards] = await Promise.all([fetchAllCards(), loadCollection()]);
-      allCards = cards;
+      allTiles = buildTileList(cards);
       const grid = document.getElementById('grid');
-      grid.innerHTML = cards.map(buildTile).join('');
+      grid.innerHTML = allTiles.map(t => buildTileHTML(t.card, t.isFoil)).join('');
       document.getElementById('controls').style.display = 'flex';
       updateStats();
       applyFilters();
