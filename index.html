@@ -50,13 +50,20 @@
     .filter-btn.active { border-color: #e8c56a; background: #1c1a0e; color: #e8c56a; }
 
     /* ── Grid ───────────────────────────────────────────────────── */
-    #grid { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 22px 24px 80px; }
+    #grid { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 22px 24px 40px; }
+    .admin-mode #grid { padding-bottom: 80px; }
 
     /* ── Card tile ──────────────────────────────────────────────── */
     .card-tile { width: 148px; flex-shrink: 0; }
 
-    .card-tile.is-foil-tile .card-img-wrap { border-color: #3a2d5a; }
-    .card-tile.is-foil-tile .card-img-wrap.owned { border-color: #a78bfa; box-shadow: 0 0 14px #a78bfa55; }
+    /* foil tiles get a shimmer border */
+    .card-tile.is-foil-tile .card-img-wrap {
+      border-color: #3a2d5a;
+    }
+    .card-tile.is-foil-tile .card-img-wrap.owned {
+      border-color: #a78bfa;
+      box-shadow: 0 0 14px #a78bfa55;
+    }
 
     .card-img-wrap {
       border-radius: 10px; overflow: hidden; border: 2px solid #1e2030;
@@ -77,6 +84,7 @@
     .owned-overlay.owned-reg  { background: #7ecb7e20; }
     .owned-overlay.owned-foil { background: #a78bfa20; }
 
+    /* foil shimmer overlay on the image */
     .foil-shimmer {
       position: absolute; inset: 0; pointer-events: none; border-radius: 8px;
       background: linear-gradient(115deg, transparent 30%, rgba(180,140,255,.13) 50%, transparent 70%);
@@ -85,6 +93,8 @@
     .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 5px; }
     .card-set-name { font-size: 10px; font-weight: 700; color: #e8d5a0; line-height: 1.25; margin-bottom: 3px; letter-spacing: .03em; }
     .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #555; margin-bottom: 4px; }
+
+    /* foil badge in the meta row */
     .foil-badge { font-size: 8px; letter-spacing: .06em; color: #7a60c0; text-transform: uppercase; font-weight: 700; }
 
     .card-btn {
@@ -92,10 +102,18 @@
       background: #1a1b2c; color: #666;
       font-size: 9px; font-weight: 700; cursor: pointer;
       letter-spacing: .05em; transition: background .15s, color .15s;
+      /* Hidden until admin mode is active */
+      display: none;
     }
     .card-btn.owned-active-reg  { background: #3d8a3d; color: #fff; }
     .card-btn.owned-active-foil { background: #4e2f8a; color: #ddd0ff; }
+
+    /* Show buttons and add hover only in admin mode */
+    .admin-mode .card-btn { display: block; }
     .admin-mode .card-btn:hover { opacity: .85; }
+
+    /* Tighten card-info padding when no button is shown */
+    .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 6px; }
 
     /* ── Admin bar ──────────────────────────────────────────────── */
     #admin-bar {
@@ -211,17 +229,17 @@
   const SCRYFALL   = 'https://api.scryfall.com/cards/search?q=%21%22Command+Tower%22&unique=prints&order=released&dir=asc';
   const COLLECTION = 'collection.json';
 
-  // ── State ─────────────────────────────────────────────────────────────────
-  let allTiles  = [];
-  let owned     = new Set();
-  let foilOwned = new Set();
+  // State
+  let allTiles  = [];   // flat list of { card, isFoil } display units
+  let owned     = new Set();   // keys: cardId          (nonfoil)
+  let foilOwned = new Set();   // keys: cardId + '_foil' (foil)
   let dirty     = false;
   let activeFilter = 'all';
   let ghToken   = localStorage.getItem('ct_token') || '';
   let ghOwner   = localStorage.getItem('ct_owner') || '';
   let ghRepo    = localStorage.getItem('ct_repo')  || '';
 
-  // ── Scryfall fetch ────────────────────────────────────────────────────────
+  // ── Scryfall ──────────────────────────────────────────────────────────────
   async function fetchAllCards() {
     let cards = [], url = SCRYFALL;
     while (url) {
@@ -236,7 +254,7 @@
     return cards.filter(c => c.legalities?.commander === 'legal');
   }
 
-  // One nonfoil tile + one foil tile per printing where applicable
+  // Build flat tile list: one nonfoil tile + one foil tile (if the printing has foil)
   function buildTileList(cards) {
     const tiles = [];
     for (const card of cards) {
@@ -246,7 +264,7 @@
     return tiles;
   }
 
-  // ── Collection load ───────────────────────────────────────────────────────
+  // ── Collection ────────────────────────────────────────────────────────────
   async function loadCollection() {
     try {
       const r = await fetch(COLLECTION + '?v=' + Date.now());
@@ -265,6 +283,7 @@
     status.textContent = 'Saving…'; status.style.color = '#777';
 
     try {
+      // Get current SHA
       const meta = await fetch(
         `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${COLLECTION}`,
         { headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' } }
@@ -295,7 +314,7 @@
     }
   }
 
-  // ── Toggle owned/foil ─────────────────────────────────────────────────────
+  // ── Toggle ────────────────────────────────────────────────────────────────
   function toggleTile(cardId, isFoil) {
     if (!ghToken) return;
     const key = isFoil ? cardId + '_foil' : cardId;
@@ -308,7 +327,7 @@
     applyFilters();
   }
 
-  // ── Render helpers ────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
   function rarityColor(r) {
     return r==='mythic'?'#e8a73a':r==='rare'?'#c8a860':r==='uncommon'?'#b0c4d8':'#9e9e9e';
   }
@@ -316,11 +335,11 @@
   function tileKey(cardId, isFoil) { return isFoil ? cardId + '_foil' : cardId; }
 
   function buildTileHTML(card, isFoil) {
-    const key      = tileKey(card.id, isFoil);
-    const isOwned  = isFoil ? foilOwned.has(key) : owned.has(key);
-    const img      = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
-    const year     = card.released_at?.slice(0,4) || '?';
-    const hl       = isOwned ? 'owned' : '';
+    const key     = tileKey(card.id, isFoil);
+    const isOwned = isFoil ? foilOwned.has(key) : owned.has(key);
+    const img     = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
+    const year    = card.released_at?.slice(0,4) || '?';
+    const hl      = isOwned ? 'owned' : '';
     const overlayClass = isFoil ? 'owned-foil' : 'owned-reg';
     const btnClass     = isFoil ? 'owned-active-foil' : 'owned-active-reg';
     const btnLabel     = isOwned
@@ -332,9 +351,7 @@
            data-id="${card.id}" data-foil="${isFoil}"
            data-set="${card.set}" data-setname="${(card.set_name||'').toLowerCase()}">
         <div class="card-img-wrap ${hl}">
-          ${img
-            ? `<img src="${img}" alt="${card.set_name}" loading="lazy" />`
-            : `<div class="card-placeholder"><span>${card.set_name}</span></div>`}
+          ${img ? `<img src="${img}" alt="${card.set_name}" loading="lazy" />` : `<div class="card-placeholder"><span>${card.set_name}</span></div>`}
           ${isFoil ? '<div class="foil-shimmer"></div>' : ''}
           ${isOwned ? `<div class="owned-overlay ${overlayClass}">${isFoil ? '✦' : '✓'}</div>` : ''}
         </div>
@@ -354,12 +371,13 @@
   }
 
   function rerenderTile(cardId, isFoil) {
-    const tile = document.querySelector(`.card-tile[data-id="${cardId}"][data-foil="${isFoil}"]`);
+    const sel  = `.card-tile[data-id="${cardId}"][data-foil="${isFoil}"]`;
+    const tile = document.querySelector(sel);
     if (!tile) return;
-    const entry = allTiles.find(t => t.card.id === cardId && t.isFoil === isFoil);
-    if (!entry) return;
+    const card = allTiles.find(t => t.card.id === cardId && t.isFoil === isFoil)?.card;
+    if (!card) return;
     const tmp = document.createElement('div');
-    tmp.innerHTML = buildTileHTML(entry.card, isFoil);
+    tmp.innerHTML = buildTileHTML(card, isFoil);
     tile.replaceWith(tmp.firstElementChild);
   }
 
@@ -388,14 +406,14 @@
   function applyFilters() {
     const q = document.getElementById('search-input').value.toLowerCase();
     document.querySelectorAll('.card-tile').forEach(tile => {
-      const id     = tile.dataset.id;
+      const id    = tile.dataset.id;
       const isFoil = tile.dataset.foil === 'true';
-      const sn     = tile.dataset.setname || '';
-      const sc     = tile.dataset.set || '';
+      const sn    = tile.dataset.setname || '';
+      const sc    = tile.dataset.set || '';
       const matchSearch = !q || sn.includes(q) || sc.includes(q);
-      const key      = tileKey(id, isFoil);
-      const isOwned  = isFoil ? foilOwned.has(key) : owned.has(key);
-      const show = matchSearch && (
+      const key   = tileKey(id, isFoil);
+      const isOwned = isFoil ? foilOwned.has(key) : owned.has(key);
+      const show  = matchSearch && (
         activeFilter === 'all' ||
         (activeFilter === 'owned'   &&  isOwned) ||
         (activeFilter === 'missing' && !isOwned)
