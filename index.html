@@ -327,21 +327,27 @@
     tile.replaceWith(tmp.firstElementChild);
   }
 
-function updateStats() {
-    // 1. Total Slots = Every clickable variation (Regular tile + Foil tile)
-    const totalSlots = allTiles.length;
+  // ── Fix: Logic for Progress Percentage ─────────────────────────────────────
+  function updateStats() {
+    // 1. Get the list of all unique printing IDs (total printings available)
+    const uniquePrintingIds = [...new Set(allTiles.map(t => t.card.id))];
+    const totalUniqueCount = uniquePrintingIds.length;
 
-    // 2. Count exactly how many 'Owned' buttons are active
-    const regOwnedCount = owned.size;
-    const foilOwnedCount = foilOwned.size;
-    const totalOwned = regOwnedCount + foilOwnedCount;
+    // 2. Count regular and foil items that are currently in our display list
+    const regOwnedCount = allTiles.filter(t => !t.isFoil && owned.has(t.card.id)).length;
+    const foilOwnedCount = allTiles.filter(t => t.isFoil && foilOwned.has(t.card.id + '_foil')).length;
 
-    // 3. Math: Total Buttons Clicked / Total Buttons Available
-    const pct = totalSlots ? Math.round((totalOwned / totalSlots) * 100) : 0;
+    // 3. Unique Completion Logic: 
+    // Count how many of the unique printings have at least one version owned (Regular OR Foil)
+    const uniqueOwnedCount = uniquePrintingIds.filter(id => 
+      owned.has(id) || foilOwned.has(id + '_foil')
+    ).length;
 
-    // Update the UI
-    // We update 'Total Printings' to show total variations so the math is clear
-    document.getElementById('stat-total').textContent = totalSlots;
+    // Calculate percentage based on unique versions found
+    const pct = totalUniqueCount ? Math.round((uniqueOwnedCount / totalUniqueCount) * 100) : 0;
+
+    // Update the DOM
+    document.getElementById('stat-total').textContent = totalUniqueCount;
     document.getElementById('stat-owned').textContent = regOwnedCount;
     document.getElementById('stat-foil').textContent  = foilOwnedCount;
     document.getElementById('stat-pct').textContent   = pct + '%';
