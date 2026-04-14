@@ -35,10 +35,10 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       letter-spacing: .06em; margin-bottom: 8px;
     }
-    .subtitle { font-size: 13px; color: #4e4658; font-style: italic; margin-bottom: 28px; }
+    .subtitle { font-size: 13px; color: #d0ccd8; font-style: italic; margin-bottom: 28px; }
     #stats { display: none; justify-content: center; gap: 28px; flex-wrap: wrap; margin-bottom: 18px; }
     .stat-val { font-size: clamp(20px,4vw,32px); font-family: 'Cinzel', serif; font-weight: 700; }
-    .stat-lbl { font-size: 9px; color: #3a3b4c; letter-spacing: .14em; text-transform: uppercase; }
+    .stat-lbl { font-size: 9px; color: #c8c4d4; letter-spacing: .14em; text-transform: uppercase; }
     #progress-wrap { display:none; max-width: 460px; margin: 0 auto; padding: 0 16px; }
     #progress-bar { height: 5px; border-radius: 3px; background: #181929; overflow: hidden; }
     #progress-fill { height: 100%; background: linear-gradient(90deg,#3d8a3d,#7ecb7e); border-radius: 3px; transition: width .6s ease; width: 0%; }
@@ -92,10 +92,17 @@
 
     .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 5px; }
     .card-set-name { font-size: 10px; font-weight: 700; color: #e8d5a0; line-height: 1.25; margin-bottom: 3px; letter-spacing: .03em; }
-    .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #555; margin-bottom: 4px; }
+    .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #c8c4d4; margin-bottom: 4px; }
 
     /* foil badge in the meta row */
     .foil-badge { font-size: 8px; letter-spacing: .06em; color: #7a60c0; text-transform: uppercase; font-weight: 700; }
+
+    /* listing number below info box */
+    .card-listing-num {
+      text-align: center; font-size: 8px; color: #4a4b60;
+      letter-spacing: .12em; text-transform: uppercase;
+      margin-top: 5px; font-family: 'Cinzel', serif;
+    }
 
     .card-btn {
       width: 100%; padding: 4px 0; border-radius: 5px; border: none;
@@ -250,17 +257,23 @@
       url = d.has_more ? d.next_page : null;
       if (url) await new Promise(r => setTimeout(r, 110));
     }
-    // Keep only commander-legal cards
-    return cards.filter(c => c.legalities?.commander === 'legal');
+    // Keep only commander-legal cards, exclude online-only sets
+    const EXCLUDED_SETS = new Set(['prm', 'abr']); // Magic Online Promos, Arena Beginner Set
+    return cards.filter(c =>
+      c.legalities?.commander === 'legal' &&
+      !EXCLUDED_SETS.has(c.set)
+    );
   }
 
   // Build flat tile list: one nonfoil tile + one foil tile (if the printing has foil)
+  // listingNum is per unique card (both foil/nonfoil of same printing share the same number)
   function buildTileList(cards) {
     const tiles = [];
-    for (const card of cards) {
-      if (card.nonfoil) tiles.push({ card, isFoil: false });
-      if (card.foil)    tiles.push({ card, isFoil: true  });
-    }
+    cards.forEach((card, idx) => {
+      const listingNum = idx + 1;
+      if (card.nonfoil) tiles.push({ card, isFoil: false, listingNum });
+      if (card.foil)    tiles.push({ card, isFoil: true,  listingNum });
+    });
     return tiles;
   }
 
@@ -334,7 +347,7 @@
 
   function tileKey(cardId, isFoil) { return isFoil ? cardId + '_foil' : cardId; }
 
-  function buildTileHTML(card, isFoil) {
+  function buildTileHTML(card, isFoil, listingNum) {
     const key     = tileKey(card.id, isFoil);
     const isOwned = isFoil ? foilOwned.has(key) : owned.has(key);
     const img     = card.image_uris?.normal || card.card_faces?.[0]?.image_uris?.normal;
@@ -366,26 +379,28 @@
                   onclick="toggleTile('${card.id}', ${isFoil})">
             ${btnLabel}
           </button>
+          <div class="card-listing-num">Printing #${listingNum}</div>
         </div>
       </div>`;
   }
 
   function rerenderTile(cardId, isFoil) {
-    const sel  = `.card-tile[data-id="${cardId}"][data-foil="${isFoil}"]`;
-    const tile = document.querySelector(sel);
+    const sel   = `.card-tile[data-id="${cardId}"][data-foil="${isFoil}"]`;
+    const tile  = document.querySelector(sel);
     if (!tile) return;
-    const card = allTiles.find(t => t.card.id === cardId && t.isFoil === isFoil)?.card;
-    if (!card) return;
+    const entry = allTiles.find(t => t.card.id === cardId && t.isFoil === isFoil);
+    if (!entry) return;
     const tmp = document.createElement('div');
-    tmp.innerHTML = buildTileHTML(card, isFoil);
+    tmp.innerHTML = buildTileHTML(entry.card, isFoil, entry.listingNum);
     tile.replaceWith(tmp.firstElementChild);
   }
 
   function updateStats() {
-    const totalCards = new Set(allTiles.map(t => t.card.id)).size;
-    const totalTiles = allTiles.length;
+    const totalCards = new Set(allTiles.map(t => t.card.id)).size; // unique printings
+    const totalTiles = allTiles.length;                             // nonfoil + foil slots
     const oc  = allTiles.filter(t => !t.isFoil && owned.has(t.card.id)).length;
     const fc  = allTiles.filter(t =>  t.isFoil && foilOwned.has(t.card.id + '_foil')).length;
+    // Progress = owned slots out of all available slots (nonfoil + foil)
     const pct = totalTiles ? Math.round((oc + fc) / totalTiles * 100) : 0;
     document.getElementById('stat-total').textContent = totalCards;
     document.getElementById('stat-owned').textContent = oc;
@@ -478,7 +493,7 @@
       const [cards] = await Promise.all([fetchAllCards(), loadCollection()]);
       allTiles = buildTileList(cards);
       const grid = document.getElementById('grid');
-      grid.innerHTML = allTiles.map(t => buildTileHTML(t.card, t.isFoil)).join('');
+      grid.innerHTML = allTiles.map(t => buildTileHTML(t.card, t.isFoil, t.listingNum)).join('');
       document.getElementById('controls').style.display = 'flex';
       updateStats();
       applyFilters();
