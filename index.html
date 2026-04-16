@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wahy's Command Tower Collection Tracker</title>
+  <title>Command Tower Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,41 +55,101 @@
 
     /* ── Card tile ──────────────────────────────────────────────── */
     .card-tile { width: 148px; flex-shrink: 0; }
-    .card-tile.is-foil-tile .card-img-wrap { border-color: #3a2d5a; }
-    .card-tile.is-foil-tile .card-img-wrap.owned { border-color: #a78bfa; box-shadow: 0 0 14px #a78bfa55; }
-    .card-img-wrap { border-radius: 10px; overflow: hidden; border: 2px solid #1e2030; box-shadow: 0 4px 16px #0009; transition: transform .18s, border-color .2s, box-shadow .2s; position: relative; }
+
+    /* foil tiles get a shimmer border */
+    .card-tile.is-foil-tile .card-img-wrap {
+      border-color: #3a2d5a;
+    }
+    .card-tile.is-foil-tile .card-img-wrap.owned {
+      border-color: #a78bfa;
+      box-shadow: 0 0 14px #a78bfa55;
+    }
+
+    .card-img-wrap {
+      border-radius: 10px; overflow: hidden; border: 2px solid #1e2030;
+      box-shadow: 0 4px 16px #0009; transition: transform .18s, border-color .2s, box-shadow .2s;
+      position: relative;
+    }
     .card-img-wrap:hover { transform: scale(1.045); }
     .card-img-wrap.owned { border-color: #7ecb7e; box-shadow: 0 0 14px #7ecb7e55; }
     .card-img-wrap img { width: 100%; display: block; }
     .card-placeholder { padding-top: 139%; position: relative; background: #161728; }
     .card-placeholder span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #333; font-size: 10px; text-align: center; padding: 6px; }
-    .owned-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; font-size: 2.2rem; filter: drop-shadow(0 2px 5px #000b); }
-    .owned-overlay.owned-reg { background: #7ecb7e20; }
+
+    .owned-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; pointer-events: none; font-size: 2.2rem;
+      filter: drop-shadow(0 2px 5px #000b);
+    }
+    .owned-overlay.owned-reg  { background: #7ecb7e20; }
     .owned-overlay.owned-foil { background: #a78bfa20; }
-    .foil-shimmer { position: absolute; inset: 0; pointer-events: none; border-radius: 8px; background: linear-gradient(115deg, transparent 30%, rgba(180,140,255,.13) 50%, transparent 70%); }
-    .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 6px; }
+
+    /* foil shimmer overlay on the image */
+    .foil-shimmer {
+      position: absolute; inset: 0; pointer-events: none; border-radius: 8px;
+      background: linear-gradient(115deg, transparent 30%, rgba(180,140,255,.13) 50%, transparent 70%);
+    }
+
+    .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 5px; }
     .card-set-name { font-size: 10px; font-weight: 700; color: #e8d5a0; line-height: 1.25; margin-bottom: 3px; letter-spacing: .03em; }
     .card-meta { display: flex; justify-content: space-between; font-size: 9px; color: #c8c4d4; margin-bottom: 4px; }
+
+    /* foil badge in the meta row */
     .foil-badge { font-size: 8px; letter-spacing: .06em; color: #7a60c0; text-transform: uppercase; font-weight: 700; }
-    .card-listing-num { text-align: center; font-size: 8px; color: #4a4b60; letter-spacing: .12em; text-transform: uppercase; margin-top: 5px; font-family: 'Cinzel', serif; }
-    .card-btn { width: 100%; padding: 4px 0; border-radius: 5px; border: none; background: #1a1b2c; color: #666; font-size: 9px; font-weight: 700; cursor: pointer; letter-spacing: .05em; transition: background .15s, color .15s; display: none; }
-    .card-btn.owned-active-reg { background: #3d8a3d; color: #fff; }
+
+    /* listing number below info box */
+    .card-listing-num {
+      text-align: center; font-size: 8px; color: #4a4b60;
+      letter-spacing: .12em; text-transform: uppercase;
+      margin-top: 5px; font-family: 'Cinzel', serif;
+    }
+
+    .card-btn {
+      width: 100%; padding: 4px 0; border-radius: 5px; border: none;
+      background: #1a1b2c; color: #666;
+      font-size: 9px; font-weight: 700; cursor: pointer;
+      letter-spacing: .05em; transition: background .15s, color .15s;
+      /* Hidden until admin mode is active */
+      display: none;
+    }
+    .card-btn.owned-active-reg  { background: #3d8a3d; color: #fff; }
     .card-btn.owned-active-foil { background: #4e2f8a; color: #ddd0ff; }
+
+    /* Show buttons and add hover only in admin mode */
     .admin-mode .card-btn { display: block; }
     .admin-mode .card-btn:hover { opacity: .85; }
 
+    /* Tighten card-info padding when no button is shown */
+    .card-info { margin-top: 5px; background: #12131f; border: 1px solid #22233a; border-radius: 8px; padding: 6px 6px 6px; }
+
     /* ── Admin bar ──────────────────────────────────────────────── */
-    #admin-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: #0e0f1a; border-top: 1px solid #2a2b3d; display: flex; align-items: center; gap: 12px; padding: 10px 20px; flex-wrap: wrap; }
+    #admin-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: #0e0f1a; border-top: 1px solid #2a2b3d;
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px; flex-wrap: wrap;
+    }
     #admin-bar .hint { font-size: 11px; color: #555; font-style: italic; flex: 1; }
-    #admin-bar .hint span.reg { color: #7ecb7e; }
+    #admin-bar .hint span.reg  { color: #7ecb7e; }
     #admin-bar .hint span.foil { color: #a78bfa; }
-    #save-btn { padding: 8px 22px; border-radius: 6px; border: none; background: linear-gradient(135deg,#3d8a3d,#5cb85c); color: #fff; font-family: 'Cinzel',serif; font-size: 11px; font-weight: 700; letter-spacing: .1em; cursor: pointer; }
+    #save-btn {
+      padding: 8px 22px; border-radius: 6px; border: none;
+      background: linear-gradient(135deg,#3d8a3d,#5cb85c); color: #fff;
+      font-family: 'Cinzel',serif; font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; cursor: pointer;
+    }
     #save-btn:disabled { opacity: .4; cursor: default; }
     #save-status { font-size: 11px; color: #777; min-width: 100px; }
     #logout-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid #2a2b3d; background: transparent; color: #444; font-family: 'Cinzel',serif; font-size: 10px; cursor: pointer; letter-spacing: .08em; }
 
     /* ── Lock button ────────────────────────────────────────────── */
-    #lock-btn { position: fixed; top: 16px; right: 16px; z-index: 200; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #22233a; background: #12131f; color: #444; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    #lock-btn {
+      position: fixed; top: 16px; right: 16px; z-index: 200;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid #22233a; background: #12131f;
+      color: #444; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
     #lock-btn.unlocked { border-color: #e8c56a; color: #e8c56a; }
 
     /* ── Modal ──────────────────────────────────────────────────── */
@@ -106,7 +166,7 @@
 
     /* ── Loader ─────────────────────────────────────────────────── */
     #loader { text-align: center; padding: 80px 0; color: #333; width: 100%; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin  { to { transform: rotate(360deg); } }
     @keyframes pulse { 0%,100%{opacity:.4}50%{opacity:1} }
     .spinner { font-size: 34px; display: inline-block; animation: spin 2s linear infinite; }
     .msg { font-family: 'Cinzel',serif; letter-spacing: .2em; font-size: 11px; margin-top: 14px; animation: pulse 2s infinite; }
@@ -170,16 +230,16 @@
   </div>
 </div>
 
-<footer>Card data · Scryfall API · Paper Commander-legal · Saved to GitHub · <span id="footer-repo"></span></footer>
+<footer>Card data · Scryfall API · Commander-legal only · Saved to GitHub · <span id="footer-repo"></span></footer>
 
 <script>
-  const SCRYFALL = 'https://api.scryfall.com/cards/search?q=%21%22Command+Tower%22+game%3Apaper+legal%3Acommander&unique=prints&order=released&dir=asc';
+  const SCRYFALL   = 'https://api.scryfall.com/cards/search?q=%21%22Command+Tower%22&unique=prints&order=released&dir=asc';
   const COLLECTION = 'collection.json';
 
   // State
-  let allTiles  = [];
-  let owned     = new Set();
-  let foilOwned = new Set();
+  let allTiles  = [];   // flat list of { card, isFoil } display units
+  let owned     = new Set();   // keys: cardId          (nonfoil)
+  let foilOwned = new Set();   // keys: cardId + '_foil' (foil)
   let dirty     = false;
   let activeFilter = 'all';
   let ghToken   = localStorage.getItem('ct_token') || '';
@@ -197,11 +257,17 @@
       url = d.has_more ? d.next_page : null;
       if (url) await new Promise(r => setTimeout(r, 110));
     }
-    const EXCLUDED_SETS = new Set(['abr']); 
-    return cards.filter(c => !EXCLUDED_SETS.has(c.set));
+    // Keep only commander-legal cards, exclude online-only sets
+    const EXCLUDED_SETS = new Set(['prm', 'abr']); // Magic Online Promos, Arena Beginner Set
+    return cards.filter(c =>
+      c.legalities?.commander === 'legal' &&
+      !EXCLUDED_SETS.has(c.set)
+    );
   }
 
-  function buildTileList(cards) {
+  // Build flat tile list: one nonfoil tile + one foil tile (if the printing has foil)
+  // listingNum is per unique card (both foil/nonfoil of same printing share the same number)
+function buildTileList(cards) {
     const tiles = [];
     let num = 0;
     cards.forEach(card => {
@@ -230,11 +296,13 @@
     status.textContent = 'Saving…'; status.style.color = '#777';
 
     try {
+      // Get current SHA
       const meta = await fetch(
         `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${COLLECTION}`,
         { headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3+json' } }
       );
       const sha = meta.ok ? (await meta.json()).sha : null;
+
       const content = JSON.stringify({ owned: [...owned], foil: [...foilOwned] }, null, 2);
       const encoded = btoa(unescape(encodeURIComponent(content)));
       const body    = { message: 'Update collection', content: encoded };
@@ -333,6 +401,14 @@ function updateStats() {
     const fc  = allTiles.filter(t =>  t.isFoil && foilOwned.has(t.card.id + '_foil')).length;
     const pct = totalTiles ? Math.round((oc + fc) / totalTiles * 100) : 0;
     document.getElementById('stat-total').textContent = totalTiles;
+    document.getElementById('stat-total').textContent = totalCards;
+    document.getElementById('stat-owned').textContent = oc;
+    document.getElementById('stat-foil').textContent  = fc;
+    document.getElementById('stat-pct').textContent   = pct + '%';
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('stats').style.display = 'flex';
+    document.getElementById('progress-wrap').style.display = 'block';
+  }
 
   function setFilter(f, btn) {
     activeFilter = f;
