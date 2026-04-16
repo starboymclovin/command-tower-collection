@@ -267,12 +267,12 @@
 
   // Build flat tile list: one nonfoil tile + one foil tile (if the printing has foil)
   // listingNum is per unique card (both foil/nonfoil of same printing share the same number)
-  function buildTileList(cards) {
+ function buildTileList(cards) {
     const tiles = [];
-    cards.forEach((card, idx) => {
-      const listingNum = idx + 1;
-      if (card.nonfoil) tiles.push({ card, isFoil: false, listingNum });
-      if (card.foil)    tiles.push({ card, isFoil: true,  listingNum });
+    let num = 0;
+    cards.forEach(card => {
+      if (card.nonfoil) tiles.push({ card, isFoil: false, listingNum: ++num });
+      if (card.foil)    tiles.push({ card, isFoil: true,  listingNum: ++num });
     });
     return tiles;
   }
@@ -395,14 +395,12 @@
     tile.replaceWith(tmp.firstElementChild);
   }
 
-  function updateStats() {
-    const totalCards = new Set(allTiles.map(t => t.card.id)).size; // unique printings
-    const totalTiles = allTiles.length;                             // nonfoil + foil slots
+function updateStats() {
+    const totalTiles = allTiles.length;
     const oc  = allTiles.filter(t => !t.isFoil && owned.has(t.card.id)).length;
     const fc  = allTiles.filter(t =>  t.isFoil && foilOwned.has(t.card.id + '_foil')).length;
-    // Progress = owned slots out of all available slots (nonfoil + foil)
     const pct = totalTiles ? Math.round((oc + fc) / totalTiles * 100) : 0;
-    document.getElementById('stat-total').textContent = totalCards;
+    document.getElementById('stat-total').textContent = totalTiles;
     document.getElementById('stat-owned').textContent = oc;
     document.getElementById('stat-foil').textContent  = fc;
     document.getElementById('stat-pct').textContent   = pct + '%';
