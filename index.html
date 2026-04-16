@@ -259,10 +259,11 @@
     }
     // Keep only commander-legal cards, exclude online-only sets
     const EXCLUDED_SETS = new Set(['prm', 'abr']); // Magic Online Promos, Arena Beginner Set
-    return cards.filter(c =>
-      c.legalities?.commander === 'legal' &&
-      !EXCLUDED_SETS.has(c.set)
-    );
+  return cards.filter(c =>
+  c.legalities?.commander === 'legal' &&
+  !c.digital &&
+  c.games.includes("paper")
+);
   }
 
   // Build flat tile list: one nonfoil tile + one foil tile (if the printing has foil)
